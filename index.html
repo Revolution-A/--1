@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACCESS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #000;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      width: 100%;
+      max-width: 400px;
+      padding: 48px 32px;
+      border: 1px solid #00ff00;
+    }
+
+    .title {
+      font-size: 1.25rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+    }
+
+    input[type="password"] {
+      background: #000;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1.2rem;
+      letter-spacing: 0.4em;
+      padding: 12px 16px;
+      width: 100%;
+      outline: none;
+      text-align: center;
+    }
+
+    input[type="password"]:focus {
+      border-color: #00ff00;
+      box-shadow: 0 0 8px #00ff0066;
+    }
+
+    button[type="submit"] {
+      background: #000;
+      border: 1px solid #00ff00;
+      color: #00ff00;
+      cursor: pointer;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 1rem;
+      letter-spacing: 0.3em;
+      padding: 12px 16px;
+      text-transform: uppercase;
+      transition: background 0.15s, color 0.15s;
+      width: 100%;
+    }
+
+    button[type="submit"]:hover {
+      background: #00ff00;
+      color: #000;
+    }
+
+    .error {
+      color: #ff0000;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+      min-height: 1.2em;
+    }
+
+    /* ── PANDA ── */
+    .panda-wrap {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      filter: drop-shadow(0 0 8px #00ff0055);
+    }
+
+    .panda-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+      animation: breathe 4s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% { transform: translateY(0px)  scale(1);    }
+      50%       { transform: translateY(-5px) scale(1.02); }
+    }
+
+    /* head sways gently */
+    .head-group {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      animation: head-sway 6s ease-in-out infinite;
+    }
+    @keyframes head-sway {
+      0%,100% { transform: rotate(0deg)   translateY(0px);  }
+      20%     { transform: rotate(-3deg)  translateY(-2px); }
+      55%     { transform: rotate(2.5deg) translateY(0px);  }
+      80%     { transform: rotate(-1deg)  translateY(1px);  }
+    }
+
+    /* ears bob slightly */
+    .ear-l {
+      transform-box: fill-box;
+      transform-origin: right bottom;
+      animation: ear-l-bob 6s ease-in-out infinite;
+    }
+    .ear-r {
+      transform-box: fill-box;
+      transform-origin: left bottom;
+      animation: ear-r-bob 6s ease-in-out infinite;
+    }
+    @keyframes ear-l-bob {
+      0%,100% { transform: rotate(0deg);   }
+      20%     { transform: rotate(-4deg);  }
+      55%     { transform: rotate(3deg);   }
+    }
+    @keyframes ear-r-bob {
+      0%,100% { transform: rotate(0deg);  }
+      20%     { transform: rotate(4deg);  }
+      55%     { transform: rotate(-3deg); }
+    }
+
+    /* blink */
+    .eye-l-grp, .eye-r-grp {
+      transform-box: fill-box;
+      transform-origin: center center;
+      animation: blink 7s ease-in-out infinite;
+    }
+    .eye-r-grp { animation-delay: 0.06s; }
+    @keyframes blink {
+      0%, 80%, 100% { transform: scaleY(1);    }
+      87%           { transform: scaleY(0.06); }
+      90%           { transform: scaleY(1);    }
+    }
+
+    /* pupils */
+    .pupil-l, .pupil-r {
+      transform-box: fill-box;
+      transform-origin: center;
+      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+    }
+    .pupil-dot {
+      animation: glow-pulse 3.5s ease-in-out infinite;
+    }
+    @keyframes glow-pulse {
+      0%,100% { opacity: 1;   }
+      50%     { opacity: 0.55; }
+    }
+
+    /* mouth */
+    .mouth-idle  { transition: opacity 0.4s ease; opacity: 1; }
+    .mouth-watch { transition: opacity 0.4s ease; opacity: 0; }
+
+    /* ── WATCHING state ── */
+    .panda-svg.watching {
+      animation: breathe-alert 2s ease-in-out infinite;
+    }
+    @keyframes breathe-alert {
+      0%,100% { transform: translateY(0px)  scale(1);    }
+      50%     { transform: translateY(-3px) scale(1.01); }
+    }
+
+    .panda-svg.watching .head-group {
+      animation: head-lean 2s ease-in-out infinite;
+    }
+    @keyframes head-lean {
+      0%,100% { transform: rotate(-1deg) translateY(3px); }
+      50%     { transform: rotate(1deg)  translateY(4px); }
+    }
+
+    .panda-svg.watching .eye-l-grp,
+    .panda-svg.watching .eye-r-grp {
+      animation: blink-alert 3.5s ease-in-out infinite;
+    }
+    @keyframes blink-alert {
+      0%, 82%, 100% { transform: scaleY(1);   }
+      88%           { transform: scaleY(0.06); }
+      91%           { transform: scaleY(1);   }
+    }
+
+    .panda-svg.watching .pupil-l {
+      transform: translate(1px, 4px);
+    }
+    .panda-svg.watching .pupil-r {
+      transform: translate(1px, 4px);
+    }
+
+    .panda-svg.watching .mouth-idle  { opacity: 0; }
+    .panda-svg.watching .mouth-watch { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- digital panda -->
+    <div class="panda-wrap">
+      <svg class="panda-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="glow-sm">
+            <feGaussianBlur stdDeviation="1.8" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <filter id="glow-md">
+            <feGaussianBlur stdDeviation="3" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- body -->
+        <g filter="url(#glow-sm)">
+          <ellipse cx="100" cy="182" rx="36" ry="24" fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+          <!-- arms -->
+          <ellipse cx="68"  cy="172" rx="10" ry="19" fill="#000" stroke="#00ff00" stroke-width="1.5" transform="rotate(-22 68 172)"/>
+          <ellipse cx="132" cy="172" rx="10" ry="19" fill="#000" stroke="#00ff00" stroke-width="1.5" transform="rotate(22 132 172)"/>
+          <!-- feet -->
+          <ellipse cx="84"  cy="196" rx="13" ry="7"  fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+          <ellipse cx="116" cy="196" rx="13" ry="7"  fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+        </g>
+
+        <!-- ── head group ── -->
+        <g class="head-group" filter="url(#glow-sm)">
+
+          <!-- ears (behind head) -->
+          <g class="ear-l">
+            <circle cx="66" cy="51" r="20" fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+            <circle cx="66" cy="51" r="11" fill="#001400" stroke="#00bb00" stroke-width="1"/>
+          </g>
+          <g class="ear-r">
+            <circle cx="134" cy="51" r="20" fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+            <circle cx="134" cy="51" r="11" fill="#001400" stroke="#00bb00" stroke-width="1"/>
+          </g>
+
+          <!-- head -->
+          <circle cx="100" cy="100" r="52" fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+
+          <!-- eye patches -->
+          <ellipse cx="78"  cy="97" rx="20" ry="18" fill="#001900"/>
+          <ellipse cx="122" cy="97" rx="20" ry="18" fill="#001900"/>
+
+          <!-- left eye -->
+          <g class="eye-l-grp">
+            <circle cx="78" cy="97" r="12" fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+            <g class="pupil-l">
+              <circle class="pupil-dot" cx="79" cy="99" r="5.5" fill="#00ff00" filter="url(#glow-md)"/>
+              <circle cx="81" cy="97" r="2.2" fill="#000"/>
+            </g>
+          </g>
+
+          <!-- right eye -->
+          <g class="eye-r-grp">
+            <circle cx="122" cy="97" r="12" fill="#000" stroke="#00ff00" stroke-width="1.5"/>
+            <g class="pupil-r">
+              <circle class="pupil-dot" cx="123" cy="99" r="5.5" fill="#00ff00" filter="url(#glow-md)"/>
+              <circle cx="125" cy="97" r="2.2" fill="#000"/>
+            </g>
+          </g>
+
+          <!-- nose -->
+          <ellipse cx="100" cy="112" rx="5.5" ry="4" fill="#00ff00"/>
+
+          <!-- mouth idle: slight smile -->
+          <path class="mouth-idle"
+            d="M 89 120 Q 100 130 111 120"
+            fill="none" stroke="#00ff00" stroke-width="1.5" stroke-linecap="round"/>
+
+          <!-- mouth watching: straight focused line -->
+          <path class="mouth-watch"
+            d="M 90 124 Q 100 124 110 124"
+            fill="none" stroke="#00ff00" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="title">ВВЕДИТЕ КОД ДОСТУПА</div>
+    <form method="POST" action="/.netlify/functions/verify">
+      <input
+        type="password"
+        name="code"
+        autocomplete="off"
+        autofocus
+        placeholder="_ _ _"
+        required
+      />
+      <button type="submit">ПОДТВЕРДИТЬ</button>
+    </form>
+    <div class="error" id="error-msg"></div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('error') === '1') {
+      document.getElementById('error-msg').textContent = 'НЕВЕРНЫЙ КОД ДОСТУПА';
+    }
+
+    const panda = document.querySelector('.panda-svg');
+    const input = document.querySelector('input[type="password"]');
+    let idleTimer;
+
+    function watch() {
+      clearTimeout(idleTimer);
+      panda.classList.add('watching');
+    }
+
+    function idle(delay = 1800) {
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => panda.classList.remove('watching'), delay);
+    }
+
+    input.addEventListener('focus', watch);
+    input.addEventListener('input', () => { watch(); idle(3000); });
+    input.addEventListener('blur',  () => idle(800));
+  </script>
+</body>
+</html>
